@@ -6,7 +6,6 @@ import com.jvtrf.ecommerce.dto.PurchaseResponse;
 import com.jvtrf.ecommerce.entity.Customer;
 import com.jvtrf.ecommerce.entity.Order;
 import com.jvtrf.ecommerce.entity.OrderItem;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -35,7 +34,7 @@ public class CheckoutServiceImpl implements CheckoutService{
         Set<OrderItem> orderItems = purchase.getOrderItems();
         orderItems.forEach(orderItem -> order.add(orderItem));
 
-        order.setBillingAddress(purchase.getBillingAddres());
+        order.setBillingAddress(purchase.getBillingAddress());
         order.setShippingAddress(purchase.getShippingAddress());
 
         Customer customer = purchase.getCustomer();
