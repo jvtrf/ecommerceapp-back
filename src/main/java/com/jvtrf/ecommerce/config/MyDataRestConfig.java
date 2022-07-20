@@ -5,6 +5,7 @@ import com.jvtrf.ecommerce.entity.Product;
 import com.jvtrf.ecommerce.entity.ProductCategory;
 import com.jvtrf.ecommerce.entity.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.metamodel.EntityType;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,9 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
 
     private EntityManager entityManager;
 
+    @Value("${allowed.origins}")
+    private String[] theAllowedOrigins;
+
     @Autowired
     public MyDataRestConfig(EntityManager theEntityManager) {
         entityManager = theEntityManager;
@@ -30,6 +36,8 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         RepositoryRestConfigurer.super.configureRepositoryRestConfiguration(config, cors);
+
+        cors.addMapping(config.getBasePath() + "/**").allowedOrigins(theAllowedOrigins);
 
         disableHttpMethods(Product.class, config);
         disableHttpMethods(ProductCategory.class, config);
@@ -40,7 +48,7 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
     }
 
     private void disableHttpMethods(Class entityClass, RepositoryRestConfiguration config) {
-        HttpMethod[] theUnsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
+        HttpMethod[] theUnsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.PATCH};
         config.getExposureConfiguration()
                 .forDomainType(entityClass)
                 .withItemExposure(((metdata, httpMethods) -> httpMethods.disable(theUnsupportedActions)))
